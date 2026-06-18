@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SENTINEL // Cybersecurity Awareness Field Guide</title>
+<meta name="description" content="Threats, defenses, applications, needs and importance of cybersecurity — a dense modern field guide.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #05090F;
+  --surface:  #0B1422;
+  --surface2: #111E30;
+  --fg:       #D8E6F0;
+  --muted:    #617A94;
+  --amber:    #F5A623;
+  --red:      #E8453C;
+  --ice:      #7EC8E3;
+  --border:   #1A2D42;
+  --sans:     'Space Grotesk', system-ui, sans-serif;
+  --mono:     'Space Mono', ui-monospace, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  line-height: 1.6;
+}
+
+/* Blueprint grid overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(126,200,227,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(126,200,227,.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+* { position: relative; z-index: 1; }
+
+h1, h2, h3, h4 { margin: 0; font-family: var(--sans); font-weight: 700; }
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--amber); color: #000; }
+
+.mono { font-family: var(--mono); }
+.amber { color: var(--amber); }
+.ice { color: var(--ice); }
+.muted { color: var(--muted); }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 28px; }
+
+/* ── TOPBAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  border-bottom: 1px solid var(--border);
+  background: rgba(5,9,15,.92);
+  backdrop-filter: blur(14px);
+}
+.topbar-inner {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px; max-width: 1200px;
+  margin: 0 auto; gap: 16px; flex-wrap: wrap;
+}
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-weight: 700; font-size: 14px;
+  letter-spacing: .06em;
+}
+.brand-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+
+.nav { display: none; gap: 24px; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; }
+@media(min-width: 768px) { .nav { display: flex; } }
+.nav a { color: var(--muted); transition: color .2s; text-transform: uppercase; }
+.nav a:hover { color: var(--amber); }
+
+.clock { font-family: var(--mono); font-size: 11px; color: var(--amber); letter-spacing: .04em; }
+
+/* ── TICKER ── */
+.ticker-wrap {
+  border-top: 1px solid var(--border);
+  background: rgba(11,20,34,.6);
+  overflow: hidden;
+}
+.ticker-track {
+  display: flex; gap: 0;
+  white-space: nowrap;
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  padding: 7px 0;
+  animation: ticker-scroll 50s linear infinite;
+  width: max-content;
+}
+.ticker-item { padding: 0 48px; display: inline-flex; align-items: center; gap: 8px; }
+@keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ── HERO ── */
+.hero {
+  padding: 120px 28px 80px;
+  overflow: hidden;
+}
+/* Radial glow behind hero */
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -60px; left: -100px;
+  width: 700px; height: 500px;
+  background: radial-gradient(ellipse at 30% 40%, rgba(245,166,35,.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  font-family: var(--mono); font-size: 11px; color: var(--amber);
+  letter-spacing: .12em; text-transform: uppercase;
+  margin-bottom: 28px;
+  display: flex; align-items: center; gap: 12px;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block; width: 32px; height: 1px; background: var(--amber);
+}
+
+.hero h1 {
+  font-size: clamp(44px, 7.5vw, 104px);
+  line-height: .92;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  color: var(--fg);
+  max-width: 880px;
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--amber);
+  display: inline-block;
+}
+
+.hero-lead {
+  max-width: 600px;
+  color: var(--muted);
+  font-size: 17px;
+  margin: 32px 0 36px;
+  line-height: 1.65;
+}
+
+.btns { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .06em;
+  border: 1px solid var(--border);
+  padding: 13px 22px;
+  transition: all .2s;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.btn:hover { background: var(--surface2); border-color: var(--muted); }
+.btn.primary {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: rgba(245,166,35,.06);
+}
+.btn.primary:hover {
+  background: var(--amber);
+  color: #000;
+}
+
+/* ── STAT STRIP ── */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-top: 72px;
+}
+@media(min-width: 768px) { .stat-strip { grid-template-columns: repeat(4, 1fr); } }
+.stat-cell {
+  background: var(--bg);
+  padding: 28px 24px;
+}
+.stat-cell .val {
+  font-family: var(--mono); font-size: 36px; font-weight: 700;
+  color: var(--amber);
+  letter-spacing: -.02em;
+  display: block;
+}
+.stat-cell .lbl {
+  font-size: 12px; color: var(--muted); margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* ── SECTION SHELL ── */
+.section {
+  border-top: 1px solid var(--border);
+  padding: 88px 28px;
+}
+.section-label {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 36px;
+}
+.section-label span {
+  font-family: var(--mono); font-size: 11px; color: var(--amber);
+  letter-spacing: .1em; white-space: nowrap; text-transform: uppercase;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.section-h2 {
+  font-size: clamp(26px, 3.8vw, 46px);
+  font-weight: 700;
+  margin-bottom: 44px;
+  max-width: 700px;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+}
+
+/* ── THREAT CARDS ── */
+.threat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+@media(min-width: 768px) { .threat-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.t-card {
+  background: var(--bg);
+  padding: 26px 22px;
+  transition: background .2s;
+}
+.t-card:hover { background: var(--surface); }
+
+.t-card-top {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 12px;
+}
+.t-code {
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  letter-spacing: .06em;
+}
+.risk-badge {
+  font-family: var(--mono); font-size: 10px;
+  padding: 2px 7px; border: 1px solid; letter-spacing: .06em;
+}
+.risk-badge.CRITICAL { color: var(--red); border-color: var(--red); }
+.risk-badge.HIGH { color: var(--amber); border-color: var(--amber); }
+.risk-badge.MEDIUM { color: var(--muted); border-color: var(--border); }
+.risk-badge.EMERGING { color: var(--ice); border-color: var(--ice); }
+
+.t-card h3 {
+  font-size: 16px; font-weight: 700; margin-bottom: 10px;
+  color: var(--fg);
+}
+.t-card:hover h3 { color: var(--amber); }
+.t-card p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.55; }
+.t-stat {
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono); font-size: 11px; color: var(--ice);
+}
+
+/* ── WHY SECTION ── */
+.why-layout {
+  display: grid; gap: 40px;
+  grid-template-columns: 1fr;
+}
+@media(min-width: 900px) { .why-layout { grid-template-columns: 2fr 1fr; } }
+
+.why-body .lead-line {
+  font-family: var(--mono); font-size: 17px; color: var(--fg);
+  margin-bottom: 24px; line-height: 1.5;
+}
+.why-body p {
+  font-size: 15px; color: var(--muted); margin: 0 0 18px; line-height: 1.7;
+}
+.highlight { color: var(--amber); }
+
+.cia-box {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 28px;
+}
+.cia-label {
+  font-family: var(--mono); font-size: 11px; color: var(--amber);
+  letter-spacing: .1em; margin-bottom: 20px; display: block;
+}
+.cia-list { list-style: none; padding: 0; margin: 0; }
+.cia-list li {
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.cia-list li:last-child { border-bottom: 0; }
+.cia-list .t { font-family: var(--mono); font-weight: 700; font-size: 14px; color: var(--amber); }
+.cia-list .d { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+.audience-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px; background: var(--border); border: 1px solid var(--border);
+  margin-top: 52px;
+}
+@media(min-width: 600px) { .audience-grid { grid-template-columns: repeat(3, 1fr); } }
+.aud-card { background: var(--bg); padding: 28px; }
+.aud-card h3 { font-family: var(--mono); color: var(--amber); font-size: 14px; margin-bottom: 10px; letter-spacing: .04em; }
+.aud-card p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.55; }
+
+/* ── DOMAINS ── */
+.domain-grid {
+  display: grid; grid-template-columns: 1fr;
+  gap: 1px; background: var(--border); border: 1px solid var(--border);
+}
+@media(min-width: 640px) { .domain-grid { grid-template-columns: 1fr 1fr; } }
+
+.d-card {
+  background: var(--bg); padding: 28px;
+  display: flex; gap: 22px; align-items: flex-start;
+  transition: background .2s;
+}
+.d-card:hover { background: var(--surface); }
+.d-num {
+  font-family: var(--mono); font-size: 42px; font-weight: 700;
+  color: rgba(245,166,35,.18); line-height: 1; flex-shrink: 0;
+  transition: color .2s;
+}
+.d-card:hover .d-num { color: rgba(245,166,35,.35); }
+.d-card h3 { font-size: 17px; margin-bottom: 6px; }
+.d-card p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.55; }
+
+/* ── APPS TABLE ── */
+.apps-table { border: 1px solid var(--border); }
+.a-row {
+  display: grid;
+  grid-template-columns: 44px 130px 1fr;
+  gap: 16px; padding: 15px 22px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px; align-items: start;
+  transition: background .2s;
+}
+.a-row:last-child { border-bottom: 0; }
+.a-row.head {
+  background: var(--surface);
+  font-family: var(--mono); font-size: 10px;
+  color: var(--muted); letter-spacing: .08em;
+}
+.a-row:not(.head):hover { background: var(--surface); }
+.a-idx { font-family: var(--mono); color: var(--amber); }
+.a-sector { font-family: var(--mono); font-weight: 700; font-size: 13px; }
+.a-use { color: var(--muted); }
+
+/* ── HABITS ── */
+.habits-grid {
+  display: grid; grid-template-columns: 1fr;
+  column-gap: 52px;
+}
+@media(min-width: 768px) { .habits-grid { grid-template-columns: 1fr 1fr; } }
+
+.habit-row {
+  display: flex; gap: 20px;
+  padding: 18px 0; border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+.habit-row:last-child { border-bottom: 0; }
+.h-num {
+  font-family: var(--mono); font-size: 20px; font-weight: 700;
+  color: var(--amber); flex-shrink: 0; min-width: 32px; line-height: 1.2;
+}
+.habit-row p { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.55; }
+
+/* ── PLAYBOOK ── */
+.playbook {
+  margin-top: 60px;
+  border: 1px solid rgba(245,166,35,.4);
+  background: var(--surface);
+  padding: 32px;
+  box-shadow: 0 0 0 1px rgba(245,166,35,.15), 0 0 40px rgba(245,166,35,.08);
+}
+.playbook-label {
+  font-family: var(--mono); font-size: 11px; color: var(--amber);
+  letter-spacing: .1em; margin-bottom: 20px; display: block;
+}
+.pb-grid {
+  display: grid; grid-template-columns: 1fr; gap: 14px;
+  margin-top: 4px;
+}
+@media(min-width: 768px) { .pb-grid { grid-template-columns: repeat(5, 1fr); } }
+.pb-step {
+  border: 1px solid var(--border); padding: 18px;
+  font-family: var(--mono);
+}
+.pb-step .n { color: var(--amber); font-size: 11px; }
+.pb-step .t { font-weight: 700; font-size: 13px; margin-top: 8px; color: var(--fg); }
+.pb-step p { margin: 8px 0 0; font-family: var(--sans); font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* ── GLOSSARY ── */
+.gloss-grid {
+  display: grid; grid-template-columns: 1fr;
+  gap: 1px; background: var(--border); border: 1px solid var(--border);
+}
+@media(min-width: 600px) { .gloss-grid { grid-template-columns: repeat(3, 1fr); } }
+.g-card { background: var(--bg); padding: 24px; }
+.g-term { font-family: var(--mono); font-weight: 700; color: var(--amber); font-size: 14px; }
+.g-card p { font-size: 13px; color: var(--muted); margin: 10px 0 0; line-height: 1.55; }
+
+/* ── CTA ── */
+.cta-section {
+  border-top: 1px solid var(--border);
+  padding: 100px 28px;
+  text-align: center;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(245,166,35,.05) 0%, transparent 65%);
+  pointer-events: none;
+}
+.cta-eyebrow {
+  font-family: var(--mono); font-size: 11px; color: var(--amber);
+  letter-spacing: .12em; margin-bottom: 20px;
+}
+.cta-section h2 {
+  font-size: clamp(28px, 4.5vw, 52px);
+  letter-spacing: -.025em; line-height: 1.1;
+  max-width: 700px; margin: 0 auto 20px;
+}
+.cta-section p {
+  color: var(--muted); max-width: 560px; margin: 0 auto;
+  font-size: 16px; line-height: 1.65;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 28px;
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  letter-spacing: .04em;
+}
+.foot-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      SENTINEL<span class="amber">/</span>SEC
+    </div>
+    <nav class="nav">
+      <a href="#threats">Threats</a>
+      <a href="#why">Why</a>
+      <a href="#domains">Domains</a>
+      <a href="#apps">Applications</a>
+      <a href="#habits">Habits</a>
+      <a href="#glossary">Glossary</a>
+    </nav>
+    <span class="clock" id="clock">—</span>
+  </div>
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="ticker"></div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">Field Guide v.2026.06 — Open Access</div>
+    <h1>
+      Cybersecurity<br>
+      is no longer<br>
+      <em>optional.</em>
+    </h1>
+    <p class="hero-lead">
+      Every 39 seconds, an attack lands somewhere. This is a dense, plain-English
+      field guide to the threats reshaping the digital world — and the defenses,
+      applications and habits that keep people, companies and nations safe.
+    </p>
+    <div class="btns">
+      <a class="btn primary" href="#threats">Explore Threats →</a>
+      <a class="btn" href="#habits">Protect Myself →</a>
+    </div>
+    <div class="stat-strip" id="stats"></div>
+  </div>
+</section>
+
+<!-- THREATS -->
+<section class="section" id="threats">
+  <div class="container">
+    <div class="section-label"><span>01 / Threat Landscape</span></div>
+    <h2 class="section-h2">The attacks shaping 2026.</h2>
+    <div class="threat-grid" id="threats-grid"></div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section class="section" id="why">
+  <div class="container">
+    <div class="section-label"><span>02 / Need &amp; Importance</span></div>
+    <h2 class="section-h2">Why cybersecurity matters — to everyone.</h2>
+    <div class="why-layout">
+      <div class="why-body">
+        <p class="lead-line">// The digital and physical worlds are now the same system.</p>
+        <p>Your salary, your medical records, the traffic lights on your street, the grid powering your home, the satellites guiding your flights — all run on software, all reachable over networks. A weakness in one node can cascade into hospitals turning patients away, factories halting, and democracies destabilising.</p>
+        <p>Cybersecurity is the discipline of keeping that system trustworthy. It protects three foundational properties — <span class="highlight">confidentiality</span>, <span class="highlight">integrity</span>, and <span class="highlight">availability</span> — known as the CIA triad. When any of them fail, real people lose money, privacy, safety, or life.</p>
+        <p>Awareness is the cheapest, most effective control we have. 82% of breaches involve a human element. A trained employee, an informed citizen, a curious kid asking "is this link real?" — each one is a sensor in a planetary defense network.</p>
+      </div>
+      <aside class="cia-box">
+        <span class="cia-label">[ THE CIA TRIAD ]</span>
+        <ul class="cia-list">
+          <li>
+            <div class="t">C — Confidentiality</div>
+            <div class="d">Only authorised eyes can see the data.</div>
+          </li>
+          <li>
+            <div class="t">I — Integrity</div>
+            <div class="d">Data is unaltered and trustworthy.</div>
+          </li>
+          <li>
+            <div class="t">A — Availability</div>
+            <div class="d">Systems are up when they're needed.</div>
+          </li>
+        </ul>
+      </aside>
+    </div>
+    <div class="audience-grid" id="audiences"></div>
+  </div>
+</section>
+
+<!-- DOMAINS -->
+<section class="section" id="domains">
+  <div class="container">
+    <div class="section-label"><span>03 / Defensive Domains</span></div>
+    <h2 class="section-h2">Eight pillars of modern defense.</h2>
+    <div class="domain-grid" id="domains-grid"></div>
+  </div>
+</section>
+
+<!-- APPS -->
+<section class="section" id="apps">
+  <div class="container">
+    <div class="section-label"><span>04 / Applications</span></div>
+    <h2 class="section-h2">Where cybersecurity shows up in real life.</h2>
+    <div class="apps-table" id="apps-tbl">
+      <div class="a-row head">
+        <div>#</div><div>SECTOR</div><div>PRIMARY USE</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HABITS -->
+<section class="section" id="habits">
+  <div class="container">
+    <div class="section-label"><span>05 / Personal Hardening</span></div>
+    <h2 class="section-h2">Ten habits that block 99% of attacks.</h2>
+    <div class="habits-grid" id="habits-grid"></div>
+
+    <div class="playbook">
+      <span class="playbook-label">[ INCIDENT PLAYBOOK // FIRST 60 MINUTES ]</span>
+      <div class="pb-grid" id="pb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- GLOSSARY -->
+<section class="section" id="glossary">
+  <div class="container">
+    <div class="section-label"><span>06 / Glossary</span></div>
+    <h2 class="section-h2">Speak the language.</h2>
+    <div class="gloss-grid" id="glossary-grid"></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <p class="cta-eyebrow">// CALL TO ACTION</p>
+    <h2>Awareness is the firewall<br>between you and the breach.</h2>
+    <p>Share this guide with one person today. Audit one account. Turn on one passkey. Small actions compound into a safer internet for everyone.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-inner">
+    <div><span class="amber">SENTINEL/SEC</span> — open cybersecurity awareness field guide</div>
+    <div>// stay paranoid, stay patched</div>
+  </div>
+</footer>
+
+<script>
+/* ── DATA ── */
+const STATS = [
+  { v: "$10.5T", l: "Projected annual cybercrime cost by 2025" },
+  { v: "39s",    l: "Average time between cyberattacks worldwide" },
+  { v: "82%",    l: "Of breaches involve a human element" },
+  { v: "287d",   l: "Average time to identify and contain a breach" }
+];
+
+const THREATS = [
+  ["T-01","Phishing","HIGH","3.4B emails/day","Deceptive messages mimic trusted brands to harvest credentials, OTPs, or push malware via spoofed links."],
+  ["T-02","Ransomware","CRITICAL","$1.1M avg ransom","Encrypts files and demands payment. Often follows a phishing entry, lateral movement, and data exfiltration."],
+  ["T-03","Social Engineering","HIGH","74% of breaches","Manipulates human trust — pretexting, vishing, baiting — to bypass technical controls entirely."],
+  ["T-04","Zero-Day Exploits","CRITICAL","97 disclosed / yr","Attacks on undisclosed software flaws before vendors can patch. Highly valuable on grey markets."],
+  ["T-05","Insider Threats","MEDIUM","$15.4M avg cost","Malicious or negligent employees with legitimate access leak, sabotage, or sell sensitive data."],
+  ["T-06","DDoS Attacks","MEDIUM","7.9M attacks/yr","Floods of traffic from botnets overwhelm services, causing downtime, lost revenue and reputational harm."],
+  ["T-07","Supply Chain","CRITICAL","+431% YoY","Compromise of a trusted vendor (SolarWinds-style) cascades into thousands of downstream targets."],
+  ["T-08","AI-Powered Attacks","EMERGING","+1265% phish","Deepfake voice/video, polymorphic malware and LLM-crafted spear phishing scaling personalised attacks."]
+];
+
+const DOMAINS = [
+  ["01","Network Security","Firewalls, IDS/IPS, segmentation, zero-trust architecture and encrypted tunnels protecting traffic in motion."],
+  ["02","Application Security","Secure SDLC, SAST/DAST, dependency scanning, WAFs, and runtime protection for web and mobile apps."],
+  ["03","Cloud Security","IAM hardening, CSPM, workload protection, secrets management across AWS, GCP, Azure and SaaS sprawl."],
+  ["04","Endpoint Security","EDR/XDR, device posture checks, MDM and disk encryption for laptops, phones, IoT and OT devices."],
+  ["05","Identity & Access","MFA, SSO, passkeys, least-privilege, privileged access management and continuous identity verification."],
+  ["06","Data Security","Classification, encryption at rest/in transit, DLP, tokenization, key management and secure deletion."],
+  ["07","Operational Security","Patch cadence, hardening baselines, change control, vulnerability management and security observability."],
+  ["08","Incident Response","Playbooks, forensics, threat hunting, tabletop exercises and 24/7 SOC monitoring for fast containment."]
+];
+
+const APPS = [
+  ["Finance","Fraud detection, transaction signing, anti-money-laundering, secure core-banking and PCI-DSS compliance."],
+  ["Healthcare","Protecting electronic health records, medical IoT devices, telemedicine and HIPAA / GDPR-Health compliance."],
+  ["Government","Critical infrastructure defense, classified data handling, election security and national cyber commands."],
+  ["Education","Student data privacy, exam integrity, ransomware resilience for schools and research IP protection."],
+  ["E-commerce","Card-not-present fraud prevention, account takeover defense, bot mitigation and checkout integrity."],
+  ["Energy & Utilities","OT/ICS security for power grids, water, oil & gas — protecting against state-sponsored sabotage."],
+  ["Transport","Securing connected vehicles, avionics, rail signaling, port logistics and autonomous mobility stacks."],
+  ["Personal Life","Password managers, MFA, encrypted messaging, backups, scam recognition and child online safety."]
+];
+
+const HABITS = [
+  "Use a password manager. 14+ char unique passphrases for every account.",
+  "Turn on MFA — prefer passkeys or an authenticator app over SMS.",
+  "Patch within 72 hours. Auto-update OS, browser, and apps.",
+  "Verify the sender before clicking. Hover links, inspect domains.",
+  "Back up 3-2-1: three copies, two media, one off-site & offline.",
+  "Encrypt devices. Enable full-disk encryption and screen locks.",
+  "Use a VPN on untrusted Wi-Fi. Disable auto-join for open networks.",
+  "Audit app permissions monthly. Revoke what you don't use.",
+  "Freeze your credit. Monitor breach databases like HIBP.",
+  "Report incidents fast. Time is the most expensive variable."
+];
+
+const PB = [
+  ["01","DISCONNECT","Pull the device offline. Don't power off — preserve volatile memory."],
+  ["02","DOCUMENT","Screenshot, log timestamps, capture indicators of compromise."],
+  ["03","RESET CREDS","Rotate every password and revoke active sessions and tokens."],
+  ["04","NOTIFY","Tell IT/SOC, your bank, and relevant authorities. Speed > shame."],
+  ["05","RECOVER","Restore from clean backups. Patch the entry vector before reconnecting."]
+];
+
+const GL = [
+  ["Zero Trust","Architecture that trusts no user or device by default. Verify continuously."],
+  ["MFA","Multi-factor auth — proves identity using two or more independent factors."],
+  ["Passkey","Phishing-resistant credential bound to a device using public-key crypto."],
+  ["EDR","Endpoint Detection & Response — agent monitoring devices for malicious behavior."],
+  ["SOC","Security Operations Center — 24/7 team triaging alerts and incidents."],
+  ["CVE","Common Vulnerabilities & Exposures — public catalog of known software flaws."],
+  ["APT","Advanced Persistent Threat — well-resourced (often state) attacker with long dwell time."],
+  ["DLP","Data Loss Prevention — controls that stop sensitive data from leaving systems."],
+  ["SIEM","Security Info & Event Management — aggregates logs for detection and forensics."]
+];
+
+const AUD = [
+  ["For Individuals","Protects savings, identity, photos, location and reputation from fraud, doxxing and account takeover."],
+  ["For Businesses","Preserves customer trust, revenue continuity, IP, supply chains and regulatory standing."],
+  ["For Nations","Defends critical infrastructure, elections, defense secrets and economic sovereignty from state actors."]
+];
+
+const TICKS = [
+  ["red",   "RANSOMWARE — Healthcare network breach, 4.2M records exposed"],
+  ["amber", "ADVISORY — CVE-2026-1183 critical RCE in popular SSO library"],
+  ["ice",   "TIP — Enable passkeys on your most-used accounts today"],
+  ["red",   "PHISHING — Tax-season campaign impersonating revenue agencies"],
+  ["amber", "ALERT — Deepfake CEO voice scams up 1265% YoY"]
+];
+
+/* ── RENDER ── */
+const $ = s => document.querySelector(s);
+
+// Stats
+$('#stats').innerHTML = STATS.map(s =>
+  `<div class="stat-cell"><span class="val">${s.v}</span><div class="lbl">${s.l}</div></div>`
+).join('');
+
+// Threats
+$('#threats-grid').innerHTML = THREATS.map(([c,n,r,s,d]) =>
+  `<article class="t-card">
+    <div class="t-card-top">
+      <span class="t-code">${c}</span>
+      <span class="risk-badge ${r}">${r}</span>
+    </div>
+    <h3>${n}</h3>
+    <p>${d}</p>
+    <div class="t-stat">▶ ${s}</div>
+  </article>`
+).join('');
+
+// Audiences
+$('#audiences').innerHTML = AUD.map(([t,d]) =>
+  `<div class="aud-card"><h3>${t}</h3><p>${d}</p></div>`
+).join('');
+
+// Domains
+$('#domains-grid').innerHTML = DOMAINS.map(([n,t,d]) =>
+  `<div class="d-card">
+    <div class="d-num">${n}</div>
+    <div><h3>${t}</h3><p>${d}</p></div>
+  </div>`
+).join('');
+
+// Apps
+$('#apps-tbl').insertAdjacentHTML('beforeend',
+  APPS.map(([s,u], i) =>
+    `<div class="a-row">
+      <div class="a-idx">${String(i+1).padStart(2,'0')}</div>
+      <div class="a-sector">${s}</div>
+      <div class="a-use">${u}</div>
+    </div>`
+  ).join('')
+);
+
+// Habits
+$('#habits-grid').innerHTML = HABITS.map((h, i) =>
+  `<div class="habit-row">
+    <span class="h-num">${String(i+1).padStart(2,'0')}</span>
+    <p>${h}</p>
+  </div>`
+).join('');
+
+// Playbook
+$('#pb').innerHTML = PB.map(([n,t,d]) =>
+  `<div class="pb-step">
+    <div class="n">${n}</div>
+    <div class="t">${t}</div>
+    <p>${d}</p>
+  </div>`
+).join('');
+
+// Glossary
+$('#glossary-grid').innerHTML = GL.map(([t,d]) =>
+  `<div class="g-card"><div class="g-term">${t}</div><p>${d}</p></div>`
+).join('');
+
+// Ticker
+const colorMap = { red: '#E8453C', amber: '#F5A623', ice: '#7EC8E3' };
+const tickHTML = TICKS.map(([c,t]) =>
+  `<span class="ticker-item"><span style="color:${colorMap[c]}">●</span>${t}</span>`
+).join('');
+$('#ticker').innerHTML = tickHTML + tickHTML;
+
+// Clock
+function updateClock() {
+  const d = new Date();
+  $('#clock').textContent = d.toISOString().replace('T',' ').slice(0,19) + ' UTC';
+}
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
